@@ -64,7 +64,8 @@ function convertRawJsonToScanResults(xmlInput) {
       const portList = host.ports[0].port
 
       const openPorts = portList.filter((port) => {
-        return (port.state[0].$.state === 'open')
+        const state = port.state[0].$.state;
+        return (state === 'open' || state === 'closed' || state === 'filtered');
       })
 
       newHost.openPorts = openPorts.map((portItem) => {
@@ -72,6 +73,9 @@ function convertRawJsonToScanResults(xmlInput) {
 
         const port = parseInt(portItem.$.portid)
         const protocol = portItem.$.protocol
+        const state = portItem.state[0].$.state
+        const reason = portItem.state[0].$.reason
+        const reason_ttl = portItem.state[0].$.reason_ttl
 
         if (portItem.service) {
           const service = portItem.service[0].$.name
@@ -83,6 +87,9 @@ function convertRawJsonToScanResults(xmlInput) {
         let portObject = {}
         if(port) portObject.port = port
         if(protocol) portObject.protocol = protocol
+        if(state) portObject.state = state
+        if(reason) portObject.reason = reason
+        if(reason_ttl) portObject.reason_ttl = reason_ttl
 
         if (portItem.service) {
           if(service) portObject.service = service
